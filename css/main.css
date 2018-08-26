@@ -253,11 +253,15 @@ nav h1 a {
   text-transform: uppercase;
 	width: 60%;
 }
+#restaurant_id{
+  visibility: hidden;
+}
 
 .restaurant-intro{
   width: 80%;
   display: block;
   margin: auto;
+  padding-top: 13em;
 }
 
 #restaurant-container{
@@ -289,7 +293,7 @@ nav h1 a {
     border: 2px solid #f3f3f3;
   display: block;
   list-style-type: none;
-  margin: 0 0 30px;
+  margin: 0 auto 30px;
   overflow: hidden;
   padding: 0 20px 20px;
   position: relative;
@@ -332,6 +336,11 @@ input,#rating {
     margin: 1em 0;
     width: 100%;
     height: 2em;
+}
+textarea{
+  display: block;
+  margin: 1em 0;
+  width: 100%;
 }
 #restaurant-hours{
    margin: 0 auto;

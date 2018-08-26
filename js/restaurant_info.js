@@ -87,10 +87,14 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name+" ";
-  // name.<a>&#9734;</a>
   var is_favorite_botton= document.createElement('a');
   is_favorite_botton.setAttribute('id', 'is_favorite');
-  is_favorite_botton.innerHTML = '&#9734;';
+  if (restaurant.is_favorite == "true"){
+    is_favorite_botton.innerHTML = '&#9733;';
+    is_favorite_botton.classList.add("favorite");
+  }else{
+    is_favorite_botton.innerHTML = '&#9734;';
+  }
   console.log(is_favorite_botton)
   name.appendChild(is_favorite_botton);
 
@@ -110,8 +114,10 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   console.log(restaurant.is_favorite)
+  console.log(restaurant.id)
   is_favorite_button=document.getElementById('is_favorite');
   is_favorite_button.addEventListener('click',toggleFavorite);
+  document.getElementById("restaurant_id").value =restaurant.id;
 }
 
 /**
@@ -168,7 +174,8 @@ createReviewHTML = (review) => {
   li.appendChild(name);
 
   const date = document.createElement('p');
-  date.innerHTML = review.date;
+  date.setAttribute('class', 'updated_time');
+  date.innerHTML = `${(new Date(review.updatedAt))}`;
   li.appendChild(date);
 
   const rating = document.createElement('p');
@@ -217,30 +224,28 @@ toggleFavorite = () =>{
     } else {
       if (restaurant) { // Got the restaurant
         console.log(restaurant)
+        var http = new XMLHttpRequest();
+        var url = `http://localhost:1337/restaurants/${id}`;
+        http.open('POST', url, true);
+
+        //Send the proper header information along with the request
+        http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
         if (restaurant.is_favorite == "true"){
-          console.log("is favorite")
-          $.ajax({
-            type: 'PUT',
-            url: `http://localhost:1337/restaurants/${id}`,
-            data: { 'is_favorite': "false" },
-            success: function() {
-              console.log("remove favorite")
-              document.getElementById('is_favorite').innerHTML = '&#9734;';
-              document.getElementById('is_favorite').classList.remove("favorite");
-            }
-          });
+            console.log("is favorite")
+            var params = 'is_favorite=false';
+            http.send(params);
+            document.getElementById('is_favorite').innerHTML = '&#9734;';
+            document.getElementById('is_favorite').classList.remove("favorite");
+            alert("Removed favorite")
         }else{
-          console.log("not favorite")
-          $.ajax({
-            type: 'PUT',
-            url: `http://localhost:1337/restaurants/${id}`,
-            data: { 'is_favorite': "true" },
-            success: function() {
-              console.log("change to favorite")
-              document.getElementById('is_favorite').innerHTML = '&#9733;';
-              document.getElementById('is_favorite').classList.add("favorite");
-            }
-          });
+            console.log("not favorite")
+            var params = 'is_favorite=true';
+            http.send(params);
+            console.log("change to favorite")
+            document.getElementById('is_favorite').innerHTML = '&#9733;';
+            document.getElementById('is_favorite').classList.add("favorite");
+            alert("add favorite")
         }
       }
     }
@@ -256,19 +261,13 @@ function toggleForm() {
     }
 }
 
-
-$("#add-review-form").submit(function(e) {
-    var form = $(this);
-    var url = form.attr('action');
-    $.ajax({
-           type: "POST",
-           url: url,
-           data: form.serialize()+ '&restaurant_id=' + parseInt(getParameterByName('id')), // serializes the form's elements.
-           success: function(data)
-           {
-               console.log(data); // show response from the php script.
-           }
-         });
-
-    e.preventDefault(); // avoid to execute the actual submit of the form.
-});
+function addReview(){
+  var submittedForm = document.getElementById("add-review-form");
+  var formData = new FormData(submittedForm);
+  var data = {"updatedAt":Date.now(), "createdAt":Date.now()};
+  formData.forEach(function(value, key){
+      data[key] = value;
+  });
+  console.log(data)
+  saveReviewDataLocally(data);
+}
