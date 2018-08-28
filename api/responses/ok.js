@@ -55,6 +55,7 @@ module.exports = function sendOK (data, options) {
   // but fall back to sending JSON(P) if no view can be inferred.
   else return res.guessView({ data: viewData, title: 'OK' }, function couldNotGuessView () {
     return res.jsonx(data);
+    // return res.redirect('back');
   });
 
 };

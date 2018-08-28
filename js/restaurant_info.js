@@ -6,6 +6,7 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
+  postPendingReview();
 });
 
 /**
@@ -261,13 +262,92 @@ function toggleForm() {
     }
 }
 
-function addReview(){
+// function addReview(){
+//   var submittedForm = document.getElementById("add-review-form");
+//   var formData = new FormData(submittedForm);
+//   try{
+//     var http = new XMLHttpRequest();
+//     var url = "http://localhost:1337/reviews"
+//     http.open('POST', url, true);
+//     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+//     http.send(formData);
+//   }catch{
+//     alert("I'm in the catch")
+//   }
+//   var data = {"updatedAt":Date.now(), "createdAt":Date.now()};
+//   formData.forEach(function(value, key){
+//       data[key] = value;
+//   });
+//   console.log(data)
+//   saveReviewDataLocally(data);
+//   window.location.href=`/restaurant.html?id=${formData.get('restaurant_id')}`
+//   window.location.reload()
+// }
+
+
+document.getElementById('review-submit-button').addEventListener('click', function(e) {
+  e.preventDefault(); // this will stop the form from submitting
   var submittedForm = document.getElementById("add-review-form");
   var formData = new FormData(submittedForm);
+  addReview(formData);
+});
+function addReview(formData, data){
   var data = {"updatedAt":Date.now(), "createdAt":Date.now()};
   formData.forEach(function(value, key){
       data[key] = value;
   });
   console.log(data)
-  saveReviewDataLocally(data);
-}
+  if(navigator.onLine) {
+      console.log("online")
+      var http = new XMLHttpRequest();
+      var url = "http://localhost:1337/reviews"
+      http.open('POST', url, true);
+      http.send(formData);
+      saveReviewDataLocally(data);
+      alert("Your review is successfullly posted")
+    }else{
+      alert("You're offline right now. Your review will be added when back online")
+      savePendingReviewDataLocally(data);
+      localStorage.myFormData = formData;
+    }
+    setTimeout(window.location.reload(), 3000)
+  }
+
+// function addReview(){
+//    event.preventDefault()
+//   if(navigator.onLine) {
+//     alert("online")
+//   }else{
+//     alert("offline")
+//
+//   }
+  // var submittedForm = document.getElementById("add-review-form");
+  // var formData = new FormData(submittedForm);
+  // var http = new XMLHttpRequest();
+  // var url = "http://localhost:1337/reviews"
+  // localStorage.myFormData = formData;
+  // http.open("POST", url, true);
+  //
+  // http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // http.setRequestHeader("Content-length", params.length);
+  // http.setRequestHeader("Connection", "close");
+  //
+  // //Call a function when the state changes.
+  // http.onreadystatechange = function() {
+  //     if(http.readyState == 4) {
+  //         if(http.status == 200) {
+  //             //call was completed successfully
+  //             //clear out our local storage
+  //             localStorage.myFormData = null;
+  //             alert("successful")
+  //             //do whatever here! (tell the user it was successful, change pages, whatever)
+  //             //doStuff();
+  //         } else {
+  //             //call was unsuccessful (user is offline)
+  //             //attempt again in 10 seconds
+  //             window.setTimeout(addReview, 10000);
+  //         }
+  //     }
+  // }
+  // http.send(formData)
+// }

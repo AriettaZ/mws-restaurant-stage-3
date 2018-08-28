@@ -42,7 +42,9 @@ class DBHelper {
         callback(null, restaurants);
       } else { // Oops!. Got an error from server.
         const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
+        const restaurants = JSON.parse(getLocalRestaurantData());
+        console.log("restaurants from local:"+restaurants)
+        callback(error, restaurants)
       }
     };
     xhr.send();
@@ -60,7 +62,9 @@ class DBHelper {
         callback(null, reviews);
       } else { // Oops!. Got an error from server.
         const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
+        const reviews = JSON.parse(getLocalReviewData());
+        console.log("reviews from local:"+reviews)
+        callback(error, reviews);
       }
     };
     xhr.send();
@@ -70,6 +74,7 @@ class DBHelper {
    * Fetch a restaurant by its ID.
    */
   static fetchRestaurantById(id, callback) {
+    postPendingReview()
     // fetch all restaurants with proper error handling.
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
@@ -107,6 +112,7 @@ class DBHelper {
    * Fetch reviews by its restaurant ID.
    */
   static fetchReviewsByRestaurant(id, callback) {
+    postPendingReview()
     let xhr = new XMLHttpRequest();
     xhr.open('GET', DBHelper.REVIEW_BY_RESTAURANT_DATABASE_URL+id);
     xhr.onload = () => {
